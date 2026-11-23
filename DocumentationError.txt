@@ -1,0 +1,106 @@
+
+Troubleshooting Guide: Cucumber.js --tags Returns 0 scenarios on Windows
+
+When running Cucumber.js with tags (--tags @TagName), seeing 2 hooks (2 passed), 0 scenarios, 0 steps means Cucumber loaded your support/hook files successfully, but failed to match any scenarios against the tag filter.
+Follow these steps in order to isolate and fix the root cause.
+
+Step 1: Verify Cucumber Can Find Your Feature Files (Dry Run)
+
+Before debugging tags, confirm that Cucumber is locating your .feature files and step definitions without executing browser code.
+powershell
+npx cucumber-js --dry-run
+Use code with caution.
+• If 0 scenarios appears: Your .feature file path is misconfigured, or the file isn't saved (Ctrl + S). Check your cucumber.js config or pass the path explicitly (npx cucumber-js features/ --dry-run).
+• If your scenarios appear (e.g., 2 scenarios (2 skipped)): Cucumber sees your files; proceed to Step 2.
+
+Step 2: Inspect the Exact Steps and Tag Placement on Disk
+
+Verify that the tag is saved on disk, spelled with exact casing (tags are case-sensitive), and placed on its own line above Scenario: or Feature:.
+powershell
+# Check exact file contents saved on disk
+Get-Content features\ErrorValidation.feature
+
+# Optional: Verify step mapping across all feature files
+npx cucumber-js --dry-run --format usage
+Use code with caution.
+Correct Gherkin formatting:
+gherkin
+Feature: Error Validation for Login Page
+
+  @ErrorValidation
+  Scenario: Login with incorrect password
+    Given user enters wrong username "admin" password and "admin12",
+    Then user verify the error message "Invalid credentials"
+Use code with caution.
+(Common mistake: putting @ErrorValidation on the same line as Scenario: or forgetting to save the file in VS Code).
+
+Step 3: Bypass npx to Isolate Windows Shell Argument Issues
+
+If --dry-run works without --tags, test calling the local binary directly:
+powershell
+.\node_modules\.bin\cucumber-js --tags "@ErrorValidation" --exit
+Use code with caution.
+• If this runs your scenario (1 scenario (1 passed)): Your code and Gherkin syntax are 100% fine. The problem is Windows shell / npm configuration stripping or mangling the @ symbol when using npx or npm run. Proceed to Step 4.
+
+Step 4: Fix Windows npm / PowerShell Shell Conflicts
+
+On Windows, three environment/config settings commonly conflict when running Playwright and Cucumber together via npx and npm run.
+
+Issue A: script-shell=powershell.exe Strips @ in npx
+
+• Symptom: npx cucumber-js --tags "@ErrorValidation" outputs 0 scenarios, while .\node_modules\.bin\cucumber-js works.
+• Why it happens: When npm has script-shell=powershell.exe configured, npx spawns an inner PowerShell subshell that treats @ErrorValidation as a PowerShell splatting operator (@) and strips it before Cucumber receives it.
+• Check:powershell
+npm config get script-shell
+Use code with caution.
+• Fix: Remove script-shell from all npm config scopes so npm/npx uses the standard Windows shell:powershell
+npm config delete script-shell --location=project
+npm config delete script-shell --location=user
+npm config delete script-shell --location=global
+Remove-Item Env:npm_config_script_shell -ErrorAction SilentlyContinue
+
+# Verify it returns "null" or "undefined"
+npm config get script-shell
+Use code with caution.
+
+Issue B: Empty $env:ComSpec Breaks npm run Scripts
+
+• Symptom: After removing script-shell=powershell.exe, npx cucumber-js --tags "@ErrorValidation" works, but npm run regression fails or exits silently.
+• Why it happens: Without script-shell, npm relies on Windows' ComSpec environment variable to locate cmd.exe. If $env:ComSpec is blank, npm run has no shell to execute scripts.
+• Check:powershell
+$env:ComSpec
+Use code with caution.
+• Fix: Restore ComSpec for your current session and persist it in Windows User Environment Variables:powershell
+$env:ComSpec = "$env:SystemRoot\System32\cmd.exe"
+[Environment]::SetEnvironmentVariable("ComSpec", "$env:SystemRoot\System32\cmd.exe", "User")
+Use code with caution.
+
+Issue C: Single Quotes in package.json Scripts (cmd.exe Quoting Rules)
+
+• Symptom: Running npm run cucumberTest outputs 0 scenarios even though npx cucumber-js --tags "@ErrorValidation" works.
+• Why it happens: Windows cmd.exe (used by npm run) does not strip single quotes ('). Writing '@ErrorValidation' in package.json passes literal single quotes to Cucumber, causing it to search for a tag literally named '@ErrorValidation'.
+• Fix in package.json: Remove single quotes around single tags, or use escaped double quotes (\") for multi-word tag expressions:
+json
+{
+  "scripts": {
+    "regression": "playwright test",
+    "webTest": "playwright test --config=playwright.config.js --grep=@web",
+    "cucumberTest": "cucumber-js --tags @ErrorValidation --exit",
+    "cucumberComplex": "cucumber-js --tags \"@ErrorValidation and not @Skip\" --exit"
+  }
+}
+Use code with caution.
+(Tip: Inside package.json "scripts", omit npx before playwright or cucumber-js—npm run automatically resolves binaries from ./node_modules/.bin.)
+
+Quick Verification Checklist
+
+Run these commands to confirm your Windows environment is properly configured:
+
+Check	Command	Expected Output
+1. npm script shell	npm config get script-shell	null (or undefined)
+2. Windows ComSpec	$env:ComSpec	C:\WINDOWS\System32\cmd.exe
+3. Direct npx with tags	npx cucumber-js --tags "@ErrorValidation" --exit	1 scenario (1 passed)
+4. npm Cucumber script	npm run cucumberTest	1 scenario (1 passed)
+5. npm Playwright script	npm run regression	Executes Playwright suite
+
+Would you like me to generate a cucumber.js configuration file for your repository so you can run named profiles (like npx cucumber-js -p error) without passing CLI tag flags at all?

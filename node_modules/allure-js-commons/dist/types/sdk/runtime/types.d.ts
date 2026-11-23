@@ -1,0 +1,57 @@
+import type { AllureMetricResult, AttachmentOptions, GlobalErrorArgs, Label, Link, ParameterMode, ParameterOptions, Status } from "../../model.js";
+export interface StepContext {
+    displayName: (name: string) => void | PromiseLike<void>;
+    parameter: (name: string, value: string, mode?: ParameterMode) => void | PromiseLike<void>;
+}
+export interface SyncStepContext {
+    displayName: (name: string) => void;
+    parameter: (name: string, value: string, mode?: ParameterMode) => void;
+}
+export interface SyncTestRuntime {
+    labels: (...labels: Label[]) => void;
+    links: (...links: Link[]) => void;
+    parameter: (name: string, value: string, options?: ParameterOptions) => void;
+    description: (markdown: string) => void;
+    descriptionHtml: (html: string) => void;
+    precondition: (markdown: string) => void;
+    preconditionHtml: (html: string) => void;
+    expectedResult: (markdown: string) => void;
+    expectedResultHtml: (html: string) => void;
+    displayName: (name: string) => void;
+    historyId: (value: string) => void;
+    testCaseId: (value: string) => void;
+    attachment: (name: string, content: Buffer | Uint8Array | string, options: AttachmentOptions) => void;
+    globalAttachment: (name: string, content: Buffer | Uint8Array | string, options: AttachmentOptions) => void;
+    globalAttachmentFromPath: (name: string, path: string, options: Omit<AttachmentOptions, "encoding">) => void;
+    globalError: (...args: GlobalErrorArgs) => void;
+    attachmentFromPath: (name: string, path: string, options: Omit<AttachmentOptions, "encoding">) => void;
+    logStep: (name: string, status?: Status, error?: Error) => void;
+    step: <T = void>(name: string, body: () => T) => T;
+    stepDisplayName: (name: string) => void;
+    stepParameter: (name: string, value: string, mode?: ParameterMode) => void;
+}
+export interface TestRuntime {
+    labels: (...labels: Label[]) => PromiseLike<void>;
+    links: (...links: Link[]) => PromiseLike<void>;
+    parameter: (name: string, value: string, options?: ParameterOptions) => PromiseLike<void>;
+    description: (markdown: string) => PromiseLike<void>;
+    descriptionHtml: (html: string) => PromiseLike<void>;
+    precondition: (markdown: string) => PromiseLike<void>;
+    preconditionHtml: (html: string) => PromiseLike<void>;
+    expectedResult: (markdown: string) => PromiseLike<void>;
+    expectedResultHtml: (html: string) => PromiseLike<void>;
+    displayName: (name: string) => PromiseLike<void>;
+    historyId: (value: string) => PromiseLike<void>;
+    testCaseId: (value: string) => PromiseLike<void>;
+    attachment: (name: string, content: Buffer | Uint8Array | string, options: AttachmentOptions) => PromiseLike<void>;
+    globalAttachment: (name: string, content: Buffer | Uint8Array | string, options: AttachmentOptions) => PromiseLike<void>;
+    globalAttachmentFromPath: (name: string, path: string, options: Omit<AttachmentOptions, "encoding">) => PromiseLike<void>;
+    globalError: (...args: GlobalErrorArgs) => PromiseLike<void>;
+    metrics: (...results: AllureMetricResult[]) => PromiseLike<void>;
+    attachmentFromPath: (name: string, path: string, options: Omit<AttachmentOptions, "encoding">) => PromiseLike<void>;
+    logStep: (name: string, status?: Status, error?: Error) => PromiseLike<void>;
+    step: <T = void>(name: string, body: () => T | PromiseLike<T>) => PromiseLike<T>;
+    stepDisplayName: (name: string) => PromiseLike<void>;
+    stepParameter: (name: string, value: string, mode?: ParameterMode) => PromiseLike<void>;
+    sync?: SyncTestRuntime;
+}

@@ -1,0 +1,428 @@
+PLAYWRIGHT CLI COMMANDS AND EXAMPLES
+====================================
+
+Use npx playwright <command> to run the Playwright version installed
+in the current project. npx automatically uses the local package.
+
+
+1. CREATE A PLAYWRIGHT PROJECT
+==============================
+
+npm init playwright@latest
+
+Creates a Playwright project interactively. It asks whether to use
+JavaScript or TypeScript, where tests should be placed, and whether
+GitHub Actions should be created.
+
+npm init playwright@latest -- --template=js
+npm init playwright@latest -- --template=ts
+
+Creates a JavaScript or TypeScript project without manually choosing
+the template.
+
+
+2. INSTALL PLAYWRIGHT
+=====================
+
+npm install -D @playwright/test
+
+Adds @playwright/test to devDependencies.
+
+npx playwright install
+
+Downloads Chromium, Firefox, and WebKit browser binaries.
+
+npx playwright install chromium
+npx playwright install firefox
+npx playwright install webkit
+npx playwright install chrome
+npx playwright install msedge
+npx playwright install chromium firefox
+
+Installs only the selected browsers or browser channels.
+
+npx playwright install --with-deps
+npx playwright install chromium --with-deps
+
+Installs browser binaries and required operating-system dependencies.
+This may require administrator or sudo privileges.
+
+npx playwright install --dry-run
+
+Displays what would be installed without downloading anything.
+
+npx playwright clear-cache
+
+Removes downloaded Playwright browser cache.
+
+npm uninstall @playwright/test
+npm uninstall playwright
+
+Removes Playwright packages from the project.
+
+
+3. DISPLAY HELP
+===============
+
+npx playwright --help
+npx playwright test --help
+npx playwright codegen --help
+npx playwright install --help
+npx playwright show-report --help
+npx playwright merge-reports --help
+
+Displays the general or command-specific options available for the
+installed Playwright version.
+
+
+4. RUN TESTS
+============
+
+npx playwright test
+
+Runs all Playwright test files.
+
+npx playwright test tests/UploadDownload.spec.js
+npx playwright test tests/UploadDownload.spec.js tests/login.spec.js
+
+Runs only the specified test files.
+
+npx playwright test -g "upload"
+npx playwright test --grep "login|checkout"
+npx playwright test --grep-invert "slow"
+
+-g or --grep runs tests whose titles match a regular expression.
+--grep-invert runs tests whose titles do not match.
+
+npx playwright test tests/UploadDownload.spec.js:10
+
+Runs the test located at or near line 10 of the specified file.
+
+npx playwright test --list
+npx playwright test tests/UploadDownload.spec.js --list
+
+Lists discovered tests without executing them.
+
+npx playwright test --config=playwright.config.js
+npx playwright test -c playwright.config.js
+
+Uses a specific configuration file.
+
+npx playwright test --project=chromium
+npx playwright test --project=chromium --project=firefox
+
+Runs tests only for the named projects configured in
+playwright.config.js.
+
+
+5. HEADED, DEBUG, AND UI MODES
+==============================
+
+npx playwright test --headed
+npx playwright test tests/UploadDownload.spec.js --headed
+
+Runs tests with a visible browser.
+
+npx playwright test --debug
+npx playwright test tests/UploadDownload.spec.js --debug
+npx playwright test -g "upload" --debug
+
+Runs tests in Playwright debug mode.
+
+npx playwright test --ui
+npx playwright test --ui tests/UploadDownload.spec.js
+
+Opens the interactive Playwright Test UI.
+
+npx playwright test --browser=chromium --headed
+npx playwright test --browser=firefox
+npx playwright test --browser=webkit
+
+Runs tests in the selected browser.
+
+
+6. WORKERS, RETRIES, TIMEOUTS, AND FAILURES
+===========================================
+
+npx playwright test --workers=4
+npx playwright test --workers=50%
+npx playwright test --workers=1
+
+Controls parallel worker count. 50% uses half of available logical
+CPU cores. One worker executes tests sequentially.
+
+npx playwright test --fully-parallel
+
+Runs every test as an independent parallel test.
+
+npx playwright test --retries=2
+npx playwright test --retries=0
+
+Retries failed tests two times or disables retries.
+
+npx playwright test --timeout=30000
+
+Sets the test timeout to 30000 milliseconds.
+
+npx playwright test --max-failures=3
+npx playwright test --max-failures=1
+
+Stops after the specified number of failed tests.
+
+npx playwright test --repeat-each=3
+
+Repeats each test three times.
+
+npx playwright test --only-changed
+
+Runs tests changed since the Git base.
+
+npx playwright test --last-failed
+
+Runs tests that failed in the previous test run.
+
+npx playwright test --forbid-only
+
+Fails if test.only or describe.only is accidentally committed.
+
+npx playwright test --pass-with-no-tests
+
+Returns success instead of failure when no tests are discovered.
+
+
+7. TRACES
+=========
+
+npx playwright test --trace=on
+npx playwright test --trace=retain-on-failure
+npx playwright test --trace=on-first-retry
+npx playwright test --trace=off
+
+Trace modes:
+- on: records every test.
+- off: does not record traces.
+- retain-on-failure: keeps a trace only for failed tests.
+- on-first-retry: records a trace during the first retry.
+
+They can also be configured in playwright.config.js:
+
+use: {
+  trace: "retain-on-failure",
+  screenshot: "only-on-failure",
+  video: "retain-on-failure"
+}
+
+
+8. REPORTS
+==========
+
+npx playwright test --reporter=list
+npx playwright test --reporter=line
+npx playwright test --reporter=dot
+npx playwright test --reporter=html
+npx playwright test --reporter=json
+npx playwright test --reporter=junit
+
+Generates the selected test report format.
+
+npx playwright test --reporter=list,html
+npx playwright test --reporter=line,json
+
+Generates multiple reports.
+
+npx playwright show-report
+npx playwright show-report playwright-report
+
+Opens an HTML report from the default or specified folder.
+
+npx playwright show-report --host=127.0.0.1
+npx playwright show-report --port=8080
+
+Serves the report on a specific host or port.
+
+npx playwright show-report --no-open
+
+Starts the report server without opening a browser.
+
+
+9. VISUAL SNAPSHOTS
+===================
+
+npx playwright test --update-snapshots
+npx playwright test --update-snapshots tests/example.spec.js
+
+Updates visual snapshot files for the specified tests.
+
+npx playwright test -u
+
+Short form of --update-snapshots.
+
+npx playwright test --ignore-snapshots
+
+Ignores visual snapshots during test execution.
+
+
+10. SHARDING
+============
+
+npx playwright test --shard=1/3
+npx playwright test --shard=2/3
+npx playwright test --shard=3/3
+
+Divides tests into three parts. Each command runs one shard and is
+typically used on a separate machine or CI job.
+
+
+11. MERGE DISTRIBUTED REPORTS
+=============================
+
+npx playwright test --reporter=blob
+npx playwright test --reporter=blob --shard=1/3
+
+Creates machine-readable blob reports for distributed test runs.
+
+npx playwright merge-reports ./blob-report
+npx playwright merge-reports ./blob-report --reporter=html
+npx playwright merge-reports ./blob-report --reporter=line,html
+
+Combines reports produced by shard or CI jobs and generates the
+selected final reporter format.
+
+
+12. CODE GENERATION
+===================
+
+npx playwright codegen
+npx playwright codegen https://example.com
+npx playwright codegen https://example.com/login
+
+Opens the Playwright test recorder for the specified URL.
+
+npx playwright codegen --browser=chromium
+npx playwright codegen --browser=firefox
+npx playwright codegen --browser=webkit
+
+Uses the selected browser while recording.
+
+npx playwright codegen --target=javascript
+npx playwright codegen --target=python
+npx playwright codegen --target=java
+npx playwright codegen --target=csharp
+
+Generates code in the selected programming language.
+
+npx playwright codegen --device="iPhone 13"
+npx playwright codegen --device="Pixel 5"
+npx playwright codegen --device="Desktop Chrome"
+
+Emulates a named mobile or desktop device.
+
+npx playwright codegen --channel=chrome
+npx playwright codegen --channel=msedge
+
+Uses an installed Chrome or Edge channel.
+
+npx playwright codegen --viewport-size="1280,720"
+
+Sets a custom browser viewport width and height.
+
+npx playwright codegen --save-storage=auth.json https://example.com
+npx playwright codegen --load-storage=auth.json https://example.com
+
+- save-storage saves cookies and local storage.
+- load-storage loads that saved authentication state.
+
+
+13. OPEN A BROWSER
+==================
+
+npx playwright open
+npx playwright open https://example.com
+npx playwright open --browser=chromium https://example.com
+npx playwright open --browser=firefox https://example.com
+npx playwright open --browser=webkit https://example.com
+
+Opens a Playwright-controlled browser manually.
+
+npx playwright open --channel=chrome https://example.com
+npx playwright open --channel=msedge https://example.com
+
+Opens installed Chrome or Microsoft Edge.
+
+npx playwright open --device="iPhone 13" https://example.com
+npx playwright open --viewport-size="1280,720" https://example.com
+npx playwright open --ignore-https-errors https://example.com
+npx playwright open --load-storage=auth.json https://example.com
+npx playwright open --timezone="Asia/Kolkata" https://example.com
+npx playwright open --color-scheme=dark https://example.com
+npx playwright open --lang=en-IN https://example.com
+
+Provides browser emulation and loading options.
+
+
+14. TAKE SCREENSHOTS
+====================
+
+npx playwright screenshot https://example.com example.png
+npx playwright screenshot --browser=chromium https://example.com example.png
+npx playwright screenshot --full-page https://example.com full-page.png
+npx playwright screenshot --device="iPhone 13" https://example.com mobile.png
+npx playwright screenshot --viewport-size="1280,720" https://example.com desktop.png
+npx playwright screenshot --type=jpeg https://example.com example.jpeg
+npx playwright screenshot --wait-for-timeout=3000 https://example.com example.png
+npx playwright screenshot --wait-for-selector="#main-content" https://example.com example.png
+
+- --full-page captures the complete page.
+- --wait-for-timeout waits for the specified milliseconds.
+- --wait-for-selector waits until the CSS selector appears.
+- --type selects png or jpeg output.
+
+
+15. GENERATE PDFS
+=================
+
+npx playwright pdf https://example.com document.pdf
+npx playwright pdf --browser=chromium https://example.com document.pdf
+npx playwright pdf --wait-for-timeout=3000 https://example.com document.pdf
+npx playwright pdf --landscape https://example.com document.pdf
+npx playwright pdf --format=A4 https://example.com document.pdf
+
+Generates a PDF from a webpage. PDF output is supported primarily
+by Chromium.
+
+
+16. INSPECT TRACES
+==================
+
+npx playwright show-trace trace.zip
+npx playwright show-trace test-results/example/trace.zip
+
+Opens the Playwright trace viewer for a stored trace.
+
+
+17. PACKAGE.JSON SCRIPT EXAMPLES
+================================
+
+Add these scripts to package.json:
+
+{
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:chromium": "playwright test --project=chromium",
+    "test:upload": "playwright test tests/UploadDownload.spec.js",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
+  }
+}
+
+Run them with npm:
+
+npm test
+npm run test:headed
+npm run test:ui
+npm run test:chromium
+npm run test:upload
+npm run test:debug
+npm run report

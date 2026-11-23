@@ -1,0 +1,17 @@
+import type { Label } from "../../model.js";
+import type { TestPlanV1 } from "../types.js";
+export declare const parseTestPlan: (options?: {
+    includeMutedTests?: boolean;
+}) => TestPlanV1 | undefined;
+export declare const includedInTestPlan: (testPlan: TestPlanV1, subject: {
+    allureId?: string;
+    id?: string;
+    fullName?: string;
+    nativeSelector?: string;
+    tags?: string[];
+}, options?: {
+    enableMutedTests?: boolean;
+}) => boolean;
+export declare const addSkipLabel: (labels: Label[]) => void;
+export declare const addSkipLabelAsMeta: (name: string) => string;
+export declare const hasSkipLabel: (labels: readonly Label[]) => boolean;
