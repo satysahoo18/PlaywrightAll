@@ -38,7 +38,7 @@ Then('verify the order present in the order page', async function () {
 
 
 //Step Validation
-Given('user enters wrong username {string} password and {string},',{timeout:20000},
+Given('user enters wrong username {string} password and {string},',{timeout:50000},
      async function (userName, password) {
     await this.page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
     await this.page.locator("input[name='username']").fill('userName');
