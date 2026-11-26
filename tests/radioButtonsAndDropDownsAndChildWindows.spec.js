@@ -30,7 +30,6 @@ test('Validate Radio Buttons and Static Dropdown', async ({ page }) => {
     await expect(page.locator("a[href*='documents-request']")).toHaveAttribute('class', 'blinkingText');
     
 
-    await page.pause();
 });
 
 test('Child Windows test', async ({ browser }) => {

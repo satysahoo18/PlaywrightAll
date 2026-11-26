@@ -15,7 +15,6 @@ test("end to End flow test", async({page})=>{
     
     await page.on('request', request=>console.log(request.url()));
     await page.on('response', response=>console.log(response.url(),response.status()));
-    await page.pause();
     
    
     

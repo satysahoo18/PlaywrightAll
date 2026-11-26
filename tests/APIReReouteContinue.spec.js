@@ -23,7 +23,6 @@ test("end to End flow test", async({page})=>{
     )
     await page.locator("button:has-text('View')").first().click();
     await expect(page.locator("div .blink_me")).toHaveText("You are not authorize to view this order");
-    await page.pause();
 
 
 }); 

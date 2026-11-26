@@ -24,5 +24,4 @@ test("End to End using Get By Locators",async({page})=>{
     await expect(page.getByText("Thankyou for the order.")).toBeVisible();
     
 
-    await page.pause();
 })

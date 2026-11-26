@@ -21,5 +21,4 @@ test("Session Storage in json", async({browser})=>{
 test("Using stored Session for login",async()=>{
     const page = await storedContext.newPage();
     await page.goto("https://rahulshettyacademy.com/client/#/dashboard/dash");
-    await page.pause();
 });

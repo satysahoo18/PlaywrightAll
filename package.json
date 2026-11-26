@@ -7,13 +7,15 @@
     "regression": "npx playwright test",
     "webTest": "playwright test --config=playwright.config.js --grep='@web'",
     "chromeTest": "playwright test tests/EndToEndPageObjectImplementation.spec.js --config playwright1.config.js --project=chrome",
-    "cucumberTest":"npx cucumber-js --tags @ErrorValidation --exit"
+    "cucumberTest": "npx cucumber-js --tags @ErrorValidation --exit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@azure/identity": "^4.14.1",
+    "@azure/playwright": "^1.1.6",
     "@playwright/test": "^1.65.1",
     "@types/node": "^25.9.1",
     "allure-playwright": "^3.15.0",

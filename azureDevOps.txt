@@ -1,0 +1,5 @@
+az role assignment create \
+-- assignee "022ee6ed-eeac-48c6-992b-64c4b60cb4fd" \
+--role "Storage Blob Data Contributor" \
+--scope "$(az stoage account show --name pwstrgtesting32da --resource-group Testing --query id -o tsv)"
+

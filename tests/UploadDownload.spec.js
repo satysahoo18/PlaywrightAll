@@ -85,5 +85,4 @@ test("Upload and download test",async ({page})=>{
     const desiredLocator = page.getByRole("row").filter({hasText:'Iphone'});
     expect(desiredLocator.getByText("61000")).toBeVisible();
 
-    await page.pause();
 })

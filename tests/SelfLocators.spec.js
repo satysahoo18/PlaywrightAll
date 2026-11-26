@@ -33,7 +33,6 @@ test('Playwright Special Locators, expect, action and test Wait timeout',async (
     const slowExpect = expect.configure({timeout:8000}); 
     await slowExpect(page.locator(".col-lg-3.col-md-6.mb-3").filter({hasText:"Nokia Edge"}).getByRole("Button")).toBeVisible();
     await page.locator(".col-lg-3.col-md-6.mb-3").filter({hasText:"Nokia Edge"}).getByRole("Button").click();
-    await page.pause();
 
 
 });

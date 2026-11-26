@@ -71,6 +71,5 @@ test("end to End flow test", async({page})=>{
     const exOrderID = await page.locator(".col-md-6 .col-text.-main").textContent();
     console.log("exOrderId : " + exOrderID);
     await expect(page.locator(".col-md-6 .col-text.-main")).toHaveText(actualOrderID);
-    await page.pause();
 
 }); 
